@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  scheduler:
+    build: scheduler/.      #path of the docker file for this specific application
+    ports:
+      - "81:80"             #Host_port:Container_port
+    depends_on:
+      - database
+    profiles:
+      - schedulind_services    #Service profiles allow you to specify which groups of containers to start and stop or establish a default group
+  storefront:
+    build: storefront/.
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - database
+    profiles:
+      - storefront_services
+  database:
+    image: "mysql"
+    env_file:
+      - ./mysql/env_vars      #path of varibales file
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d:ro        #source:target:access_mode
+      - kineteco:var/lib/mysql                        #by default access-mode will rw(ReadWrite)
+volumes:
+  kineteco:
